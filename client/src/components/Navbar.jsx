@@ -23,13 +23,6 @@ const Navbar = () => {
     handleLogout,
   } = useContext(context);
 
-  function clearAuthCookies() {
-    document.cookie =
-      "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; max-age=0";
-    document.cookie =
-      "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; max-age=0";
-  }
-
   async function logout() {
     setIsLoggingOut(true);
     try {
@@ -43,7 +36,6 @@ const Navbar = () => {
         error.response?.data?.error || "Something went wrong, try again later.";
       toast.error(message);
     } finally {
-      clearAuthCookies();
       setIsLoggingOut(false);
     }
   }
