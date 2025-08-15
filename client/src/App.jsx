@@ -18,7 +18,6 @@ import AddProduct from "./pages/seller/AddProduct";
 import ProductsList from "./pages/seller/ProductsList";
 import Orders from "./pages/seller/Orders";
 import Signup from "./components/Signup";
-import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import EditProduct from "./pages/seller/EditProduct";
@@ -29,6 +28,7 @@ import Complaints from "./pages/seller/Complaints";
 import AddCategory from "./pages/seller/AddCategory";
 import CategoriesList from "./pages/seller/CategoriesList";
 import EditCategory from "./pages/seller/EditCategory";
+import VerifyEmail from "./pages/VerifyEmail";
 
 function App() {
   const { showUserLogin, showUserSignup, isSeller } = useContext(context);
