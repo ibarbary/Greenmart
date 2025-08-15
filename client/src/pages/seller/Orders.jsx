@@ -263,11 +263,7 @@ const Orders = () => {
         paymentType,
       });
 
-<<<<<<< HEAD
       toast.success(`Updated Items Status`);
-=======
-     toast.success(`Updated Items Status`);
->>>>>>> 718dcbd6dcfa57373f6ef81f4e06004afeed77fc
 
       setEditingOrderId(null);
       setSelectedOrderItems([]);
