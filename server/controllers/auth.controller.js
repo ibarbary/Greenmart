@@ -19,6 +19,13 @@ const ACCESS_TOKEN_EXPIRY = "15m";
 const REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60 * 1000;
 const REMEMBER_ME_EXPIRY = 30 * 24 * 60 * 60 * 1000;
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
+};
+
 function generateSecureToken() {
   return crypto.randomBytes(32).toString("hex");
 }
@@ -27,16 +34,12 @@ function setAuthCookies(res, accessToken, refreshToken, rememberMe = false) {
   const refreshExpiry = rememberMe ? REMEMBER_ME_EXPIRY : REFRESH_TOKEN_EXPIRY;
 
   res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    ...cookieOptions,
     maxAge: 15 * 60 * 1000,
   });
 
   res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    ...cookieOptions,
     maxAge: refreshExpiry,
   });
 }
@@ -402,29 +405,20 @@ async function refreshAccessToken(req, res) {
     );
 
     res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      ...cookieOptions,
       maxAge: 15 * 60 * 1000,
     });
 
     const user = createUserResponse(userData, userData.cart_id);
 
-    return res.status(200).json({ user, message: "Token refreshed successfully" });
+    return res
+      .status(200)
+      .json({ user, message: "Token refreshed successfully" });
   } catch (error) {
     console.error(error);
 
-    res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  });
-
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  });
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
 
     return res.status(400).json({ error: "Invalid refresh token" });
   }
@@ -516,17 +510,8 @@ async function logoutUser(req, res) {
     }
   }
 
-  res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  });
-
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  });
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
 
   return res.status(200).json({ message: "Logged out successfully" });
 }
