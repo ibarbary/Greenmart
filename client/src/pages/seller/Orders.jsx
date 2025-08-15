@@ -266,9 +266,7 @@ const Orders = () => {
         paymentType,
       });
 
-      toast.success(
-        `Updated status of ${selectedOrderItems.length} items successfully`
-      );
+     toast.success(`Updated Items Status`);
 
       setEditingOrderId(null);
       setSelectedOrderItems([]);
