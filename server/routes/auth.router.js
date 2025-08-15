@@ -10,7 +10,7 @@ import {
   verifyEmail,
   verifyLoggedIn,
 } from "../controllers/auth.controller.js";
-import { optionalAuth, verifyToken } from "../auth/jwt.js";
+import { verifyToken } from "../auth/jwt.js";
 
 const authRouter = express.Router();
 
