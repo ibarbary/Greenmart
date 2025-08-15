@@ -499,77 +499,21 @@ async function verifyLoggedIn(req, res) {
 }
 
 async function logoutUser(req, res) {
-  console.log('=== LOGOUT FUNCTION STARTED ===');
-  
   const { refreshToken } = req.cookies;
-  
-  console.log('Environment check:');
-  console.log('- NODE_ENV:', process.env.NODE_ENV);
-  console.log('- CLIENT_URL:', process.env.CLIENT_URL);
-  console.log('- Request cookies:', req.cookies);
-  
-  // Check if cookieOptions is properly defined
-  console.log('- cookieOptions defined?', typeof cookieOptions !== 'undefined');
-  if (typeof cookieOptions !== 'undefined') {
-    console.log('- cookieOptions value:', JSON.stringify(cookieOptions, null, 2));
-  } else {
-    console.log('- cookieOptions is UNDEFINED!');
-  }
-  
+
   if (refreshToken) {
     try {
       const queryText = queryList.DELETE_REFRESH_TOKEN;
       await pool.query(queryText, [refreshToken]);
-      console.log('✓ Refresh token deleted from database');
     } catch (error) {
-      console.error('✗ Error revoking refresh token:', error);
+      console.error("Error revoking refresh token:", error);
     }
-  } else {
-    console.log('- No refresh token found in cookies');
   }
-
-  console.log('Attempting to clear cookies...');
   
-  try {
-    // Method 1: Using cookieOptions (if defined)
-    if (typeof cookieOptions !== 'undefined') {
-      console.log('- Trying with cookieOptions...');
-      res.clearCookie("accessToken", cookieOptions);
-      res.clearCookie("refreshToken", cookieOptions);
-    }
-    
-    // Method 2: Explicit options
-    console.log('- Trying with explicit options...');
-    const explicitOptions = {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-    };
-    res.clearCookie("accessToken", explicitOptions);
-    res.clearCookie("refreshToken", explicitOptions);
-    
-    // Method 3: Manual Set-Cookie headers
-    console.log('- Trying with manual Set-Cookie headers...');
-    const existingCookies = res.getHeaders()['set-cookie'] || [];
-    const newCookies = [
-      'accessToken=; Path=/; HttpOnly; Secure; SameSite=None; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
-      'refreshToken=; Path=/; HttpOnly; Secure; SameSite=None; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
-    ];
-    
-    res.setHeader('Set-Cookie', [...existingCookies, ...newCookies]);
-    
-    console.log('- Current response headers after cookie operations:', res.getHeaders());
-    
-  } catch (error) {
-    console.error('✗ Error during cookie clearing:', error);
-  }
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
 
-  console.log('=== LOGOUT FUNCTION ENDING ===');
-
-  return res.status(200).json({ 
-    message: "Logged out successfully"
-  });
+  return res.status(200).json({ message: "Logged out successfully" });
 }
 
 export {
