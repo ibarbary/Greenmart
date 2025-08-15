@@ -24,7 +24,6 @@ const cookieOptions = {
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   path: "/",
-  domain: process.env.NODE_ENV === "production" ? process.env.COOKIE_DOMAIN : undefined,
 };
 
 function generateSecureToken() {
@@ -421,6 +420,9 @@ async function refreshAccessToken(req, res) {
     res.clearCookie("accessToken", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);
 
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
+
     return res.status(400).json({ error: "Invalid refresh token" });
   }
 }
@@ -513,6 +515,9 @@ async function logoutUser(req, res) {
 
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
+
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
 
   return res.status(200).json({ message: "Logged out successfully" });
 }
