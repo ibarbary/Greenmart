@@ -24,6 +24,7 @@ const cookieOptions = {
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   path: "/",
+  domain: process.env.NODE_ENV === "production" ? process.env.COOKIE_DOMAIN : undefined,
 };
 
 function generateSecureToken() {
