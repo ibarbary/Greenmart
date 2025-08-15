@@ -16,7 +16,6 @@ import complaintRouter from "./routes/complaint.router.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
 const app = express();
 
 const limiter = rateLimit({
@@ -59,6 +58,11 @@ app.get("*", (req, res) => {
   res.redirect(frontendUrl + req.originalUrl);
 });
 
-app.listen(PORT, () => {
-  console.log(`server is listening on port ${PORT}`);
-});
+export default app;
+
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
+  });
+}
