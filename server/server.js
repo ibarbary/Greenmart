@@ -28,20 +28,19 @@ const limiter = rateLimit({
 });
 
 app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
+app.use(
   helmet.contentSecurityPolicy({
     directives: {
       imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
     },
   })
 );
-
 app.use(limiter);
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  })
-);
 app.use(express.json());
 app.use(cookieParser());
 
