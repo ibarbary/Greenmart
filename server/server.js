@@ -3,8 +3,6 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import path from "path";
-import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import productRouter from "./routes/product.router.js";
 import categoryRouter from "./routes/category.router.js";
@@ -18,10 +16,7 @@ import complaintRouter from "./routes/complaint.router.js";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
-
 const app = express();
 
 const limiter = rateLimit({
@@ -49,7 +44,6 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/auth", authRouter);
 app.use("/api/products", productRouter);
@@ -60,12 +54,9 @@ app.use("/api/orders", verifyToken, orderRouter);
 app.use("/api/statuses", statusRouter);
 app.use("/api/complaints", verifyToken, complaintRouter);
 
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello Greenmart!");
+app.get("*", (req, res) => {
+  const frontendUrl = process.env.CLIENT_URL;
+  res.redirect(frontendUrl + req.originalUrl);
 });
 
 app.listen(PORT, () => {
