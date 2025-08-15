@@ -1,5 +1,3 @@
-import cluster from "cluster";
-import os from "os";
 import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
@@ -24,63 +22,48 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
 
-if (cluster.isPrimary) {
-  const cpuCount = os.cpus().length;
-  console.log(`Master process running. Forking ${cpuCount} workers...`);
+const app = express();
 
-  for (let i = 0; i < cpuCount; i++) {
-    cluster.fork();
-  }
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: "Too many requests from this IP, please try again after 10 minutes.",
+});
 
-  cluster.on("exit", (worker) => {
-    console.log(`Worker ${worker.process.pid} died. Restarting...`);
-    cluster.fork();
-  });
-} else {
-  const app = express();
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+    },
+  })
+);
 
-  const limiter = rateLimit({
-    windowMs: 10 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message:
-      "Too many requests from this IP, please try again after 10 minutes.",
-  });
+app.use(limiter);
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
 
-  app.use(
-    helmet.contentSecurityPolicy({
-      directives: {
-        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
-      },
-    })
-  );
+app.use("/api/auth", authRouter);
+app.use("/api/products", productRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/cart", verifyToken, cartRouter);
+app.use("/api/addresses", verifyToken, addressRouter);
+app.use("/api/orders", verifyToken, orderRouter);
+app.use("/api/statuses", statusRouter);
+app.use("/api/complaints", verifyToken, complaintRouter);
 
-  app.use(limiter);
-  app.use(
-    cors({
-      origin: process.env.CLIENT_URL,
-      credentials: true,
-    })
-  );
-  app.use(express.json());
-  app.use(cookieParser());
-  app.use(express.static(path.join(__dirname, "public")));
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-  app.use("/api/auth", authRouter);
-  app.use("/api/products", productRouter);
-  app.use("/api/categories", categoryRouter);
-  app.use("/api/cart", verifyToken, cartRouter);
-  app.use("/api/addresses", verifyToken, addressRouter);
-  app.use("/api/orders", verifyToken, orderRouter);
-  app.use("/api/statuses", statusRouter);
-  app.use("/api/complaints", verifyToken, complaintRouter);
-
-  app.use((req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-  });
-
-  app.listen(PORT, () => {
-    console.log(`Worker ${process.pid} is listening on port ${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`server is listening on port ${PORT}`);
+});
