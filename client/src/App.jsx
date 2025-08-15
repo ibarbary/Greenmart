@@ -18,7 +18,7 @@ import AddProduct from "./pages/seller/AddProduct";
 import ProductsList from "./pages/seller/ProductsList";
 import Orders from "./pages/seller/Orders";
 import Signup from "./components/Signup";
-import VerifyEmail from "./pages/verifyEmail";
+import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import EditProduct from "./pages/seller/EditProduct";
