@@ -159,7 +159,7 @@ function EditCategory() {
           className="px-8 py-2.5 bg-primary hover:bg-primary-darker text-white font-medium rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Adding..." : "ADD"}
+          {isSubmitting ? "Updating..." : "Update"}
         </button>
       </form>
     </div>
