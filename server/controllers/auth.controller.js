@@ -510,12 +510,12 @@ async function logoutUser(req, res) {
     }
   }
 
-  console.log("NODE_ENV:", process.env.NODE_ENV);
-  console.log("cookieOptions:", cookieOptions);
-  console.log("cookies received:", req.cookies);
+  console.log("cookies before:", req.cookies);
   
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
+
+   console.log("cookies after:", req.cookies);
 
   return res.status(200).json({ message: "Logged out successfully" });
 }
