@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { context } from "../context/AppContext";
 import Pagination from "../components/Pagination";
@@ -9,6 +9,12 @@ import { useSearchParams } from "react-router-dom";
 function Products() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
+  const previousQuery = useRef(query);
+
+  const [currentPage, setCurrentPage] = useState(() => {
+    const stored = sessionStorage.getItem("productsCurrentPage");
+    return stored ? parseInt(stored) : 1;
+  });
 
   const {
     products,
@@ -18,8 +24,6 @@ function Products() {
     PRODUCTS_PER_PAGE,
     totalPages,
     setTotalPages,
-    currentPage,
-    setCurrentPage,
     totalProducts,
     setTotalProducts,
   } = useContext(context);
@@ -45,12 +49,19 @@ function Products() {
   }
 
   useEffect(() => {
-    setCurrentPage(1);
+    const currentCategory = sessionStorage.getItem("currentCategory");
+    if (
+      previousQuery.current !== query ||
+      (currentCategory && currentCategory !== "all")
+    ) {
+      setCurrentPage(1);
+      previousQuery.current = query;
+    }
   }, [query]);
 
   useEffect(() => {
     fetchProducts();
-    sessionStorage.setItem("currentPage", currentPage);
+    sessionStorage.setItem("productsCurrentPage", currentPage);
     sessionStorage.setItem("currentCategory", "all");
     window.scrollTo({ top: 0 });
   }, [currentPage, query]);
@@ -93,7 +104,7 @@ function Products() {
         {products
           ?.filter((product) => product.instock)
           .map((product, index) => {
-            return <ProductCard key={index} product={product} />;
+            return <ProductCard key={product.id} product={product} />;
           })}
       </div>
 
