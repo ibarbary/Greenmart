@@ -510,9 +510,19 @@ async function logoutUser(req, res) {
     }
   }
   
-  res.clearCookie("accessToken", cookieOptions);
-  res.clearCookie("refreshToken", cookieOptions);
+  const domain = req.get('host');
+  
+  const clearOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    domain: `.${domain}`
+  };
 
+  res.clearCookie("accessToken", clearOptions);
+  res.clearCookie("refreshToken", clearOptions);
+  
   return res.status(200).json({ message: "Logged out successfully" });
 }
 
