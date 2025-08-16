@@ -11,7 +11,10 @@ import axios from "../Utils/axiosInstance.js";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
+  const [searchInput, setSearchInput] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("query") || "";
+  });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const {
@@ -66,6 +69,7 @@ const Navbar = () => {
             className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500"
             type="text"
             placeholder="Search products"
+            value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
             }}
