@@ -22,7 +22,7 @@ const ProductCard = ({ product }) => {
 
       <div className="text-gray-500/60 text-sm mt-2 flex flex-col flex-grow">
         <p>{product.category}</p>
-        <p className="text-gray-700 font-medium text-lg w-full">
+        <p className="text-gray-700 font-medium text-lg w-full overflow-hidden line-clamp-4">
           {product.name}
         </p>
         <div className="flex-grow" />
