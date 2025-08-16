@@ -9,8 +9,15 @@ import noProducts from "../assets/no-products.png";
 function ProductCategory() {
   const { category } = useParams();
   const [currentPage, setCurrentPage] = useState(() => {
-    const stored = sessionStorage.getItem("categoryCurrentPage");
-    return stored ? parseInt(stored) : 1;
+    const storedCategory = sessionStorage.getItem("currentCategory");
+
+    if (storedCategory === category) {
+      const stored = sessionStorage.getItem("categoryCurrentPage");
+      return stored ? parseInt(stored) : 1;
+    }
+
+    sessionStorage.removeItem("categoryCurrentPage");
+    return 1;
   });
 
   const {
@@ -51,9 +58,11 @@ function ProductCategory() {
   }
 
   useEffect(() => {
-    if (sessionStorage.getItem("currentCategory") != category)
+    const storedCategory = sessionStorage.getItem("currentCategory");
+    if (storedCategory !== category) {
       setCurrentPage(1);
-
+      setProducts([]);
+    }
     sessionStorage.setItem("currentCategory", category);
   }, [category]);
 
@@ -61,7 +70,7 @@ function ProductCategory() {
     fetchProducts();
     sessionStorage.setItem("categoryCurrentPage", currentPage);
     window.scrollTo({ top: 0 });
-  }, [currentPage]);
+  }, [currentPage, category]);
 
   if (isLoadingProducts) {
     return (
