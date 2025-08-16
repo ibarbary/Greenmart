@@ -509,13 +509,22 @@ async function logoutUser(req, res) {
       console.error("Error revoking refresh token:", error);
     }
   }
-
-  console.log("cookies before:", req.cookies);
   
-  res.clearCookie("accessToken", cookieOptions);
-  res.clearCookie("refreshToken", cookieOptions);
+  res.cookie("accessToken", "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    expires: new Date(0),
+  });
 
-   console.log("cookies after:", req.cookies);
+  res.cookie("refreshToken", "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    expires: new Date(0),
+  });
 
   return res.status(200).json({ message: "Logged out successfully" });
 }
