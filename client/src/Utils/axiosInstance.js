@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await axios.get("/api/auth/refresh-token");
+        await axiosInstance.get("/api/auth/refresh-token");
 
         return axiosInstance(originalRequest);
       } catch (error) {
