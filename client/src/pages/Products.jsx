@@ -12,8 +12,16 @@ function Products() {
   const previousQuery = useRef(query);
 
   const [currentPage, setCurrentPage] = useState(() => {
-    const stored = sessionStorage.getItem("productsCurrentPage");
-    return stored ? parseInt(stored) : 1;
+    const currentCategory = sessionStorage.getItem("currentCategory");
+    const storedQuery = sessionStorage.getItem("currentQuery") || "";
+
+    if (currentCategory === "all" && storedQuery === query) {
+      const stored = sessionStorage.getItem("productsCurrentPage");
+      return stored ? parseInt(stored) : 1;
+    }
+
+    sessionStorage.removeItem("productsCurrentPage");
+    return 1;
   });
 
   const {
@@ -55,6 +63,7 @@ function Products() {
       (currentCategory && currentCategory !== "all")
     ) {
       setCurrentPage(1);
+      setProducts([]);
       previousQuery.current = query;
     }
   }, [query]);
@@ -63,6 +72,7 @@ function Products() {
     fetchProducts();
     sessionStorage.setItem("productsCurrentPage", currentPage);
     sessionStorage.setItem("currentCategory", "all");
+    sessionStorage.setItem("currentQuery", query);
     window.scrollTo({ top: 0 });
   }, [currentPage, query]);
 
