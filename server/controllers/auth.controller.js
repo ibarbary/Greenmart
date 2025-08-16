@@ -509,6 +509,8 @@ async function logoutUser(req, res) {
       console.error("Error revoking refresh token:", error);
     }
   }
+
+  console.log(req.cookies);
   
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
