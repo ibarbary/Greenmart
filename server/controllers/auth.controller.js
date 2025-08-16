@@ -510,21 +510,8 @@ async function logoutUser(req, res) {
     }
   }
   
-  res.cookie("accessToken", "", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-    expires: new Date(0),
-  });
-
-  res.cookie("refreshToken", "", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-    expires: new Date(0),
-  });
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
 
   return res.status(200).json({ message: "Logged out successfully" });
 }
