@@ -510,7 +510,9 @@ async function logoutUser(req, res) {
     }
   }
 
-  console.log(req.cookies);
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("cookieOptions:", cookieOptions);
+  console.log("cookies received:", req.cookies);
   
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
