@@ -14,10 +14,30 @@ async function getProducts(req, res) {
   const limit = parseInt(req.query.limit) || 50;
   const offset = parseInt(req.query.offset) || 0;
   const searchQuery = req.query.query || "";
-  const categoryId = parseInt(req.query.categoryId);
+  const category = req.query.category || "";
   const inStock = req.query.inStock;
+  let categoryId = null;
 
   try {
+    if (category) {
+      const result = await pool.query(
+        `SELECT id FROM categories WHERE name = $1`,
+        [category]
+      );
+
+      console.log(category, result.rows[0]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: "Category not found",
+          products: [],
+          totalCount: 0,
+        });
+      }
+
+      categoryId = result.rows[0].id;
+    }
+
     if (searchQuery.trim()) {
       const { products, totalCount } = await searchProducts(
         searchQuery,
@@ -33,16 +53,6 @@ async function getProducts(req, res) {
     let whereConditions = [];
     let queryValues = [];
     let valueIndex = 1;
-
-    if (searchQuery?.trim()) {
-      whereConditions.push(
-        `(name ILIKE $${valueIndex} OR EXISTS (
-    SELECT 1 FROM unnest(description) d WHERE d ILIKE $${valueIndex}
-  ))`
-      );
-      queryValues.push(`%${searchQuery.trim()}%`);
-      valueIndex++;
-    }
 
     if (categoryId) {
       whereConditions.push(`category_id = $${valueIndex}`);
