@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { context } from "../context/AppContext";
 import ProductCard from "../components/ProductCard";
@@ -8,17 +8,19 @@ import noProducts from "../assets/no-products.png";
 
 function ProductCategory() {
   const { category } = useParams();
+  const [currentPage, setCurrentPage] = useState(() => {
+    const stored = sessionStorage.getItem("categoryCurrentPage");
+    return stored ? parseInt(stored) : 1;
+  });
+
   const {
     products,
-    categories,
     setProducts,
     isLoadingProducts,
     setIsLoadingProducts,
     PRODUCTS_PER_PAGE,
     totalPages,
     setTotalPages,
-    currentPage,
-    setCurrentPage,
     totalProducts,
     setTotalProducts,
   } = useContext(context);
@@ -26,11 +28,9 @@ function ProductCategory() {
   async function fetchProducts() {
     setIsLoadingProducts(true);
     try {
-      const categoryObj = categories.find((c) => c.name === category);
-      const categoryId = categoryObj?.id;
       const offset = (currentPage - 1) * PRODUCTS_PER_PAGE;
       const { data } = await axios.get(
-        `/api/products?categoryId=${categoryId}&limit=${PRODUCTS_PER_PAGE}&offset=${offset}`
+        `/api/products?category=${category}&limit=${PRODUCTS_PER_PAGE}&offset=${offset}`
       );
 
       await new Promise((resolve) => setTimeout(resolve, 200));
@@ -40,6 +40,11 @@ function ProductCategory() {
       setTotalPages(Math.ceil(data.totalCount / PRODUCTS_PER_PAGE));
     } catch (error) {
       console.error("Error fetching products: ", error.message);
+      if (error.response?.status === 404) {
+        setProducts([]);
+        setTotalProducts(0);
+        setTotalPages(0);
+      }
     } finally {
       setIsLoadingProducts(false);
     }
@@ -54,7 +59,7 @@ function ProductCategory() {
 
   useEffect(() => {
     fetchProducts();
-    sessionStorage.setItem("currentPage", currentPage);
+    sessionStorage.setItem("categoryCurrentPage", currentPage);
     window.scrollTo({ top: 0 });
   }, [currentPage]);
 
