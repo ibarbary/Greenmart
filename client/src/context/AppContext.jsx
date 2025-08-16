@@ -19,9 +19,6 @@ function AppContext({ children }) {
 
   const [ordersCount, setOrdersCount] = useState(0);
   const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(
-    parseInt(sessionStorage.getItem("currentPage")) || 1
-  );
   const [totalPages, setTotalPages] = useState(1);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -51,7 +48,6 @@ function AppContext({ children }) {
     setCart({});
     setAddresses([]);
     setSelectedAddress(null);
-    setCurrentPage(1);
     setTotalPages(1);
     setTotalProducts(0);
   }
@@ -441,8 +437,6 @@ function AppContext({ children }) {
         setIsLoadingProducts,
         totalPages,
         setTotalPages,
-        currentPage,
-        setCurrentPage,
         totalProducts,
         setTotalProducts,
       }}
