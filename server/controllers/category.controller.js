@@ -117,7 +117,10 @@ async function updateCategory(req, res) {
     return res.status(400).json({ error: "Invalid Category Id" });
   }
 
+  const client = await pool.connect();
   try {
+    await client.query("BEGIN");
+
     let finalImage = "";
     let newPublicId = "";
     if (newImage) {
@@ -154,7 +157,7 @@ async function updateCategory(req, res) {
       newPublicId = image_public_id;
     }
 
-    await pool.query(queryList.UPDATE_CATEGORY, [
+    await client.query(queryList.UPDATE_CATEGORY, [
       name,
       finalImage,
       newPublicId,
@@ -162,10 +165,21 @@ async function updateCategory(req, res) {
       id,
     ]);
 
+    if (name && name.trim() !== "") {
+      await client.query(
+        `UPDATE products SET category = $1 WHERE category_id = $2`,
+        [name, id]
+      );
+    }
+
+    await client.query("COMMIT");
     return res.status(200).json({ message: "Category updated" });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.log(error);
     return res.status(500).json({ error: "Failed to update category" });
+  } finally {
+    client.release();
   }
 }
 
